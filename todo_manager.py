@@ -8,11 +8,15 @@ tasks = {}
 PRIORITY_ORDER = {"high": 0, "medium": 1, "low": 2}
 
 
-def addTask(title, priority="medium", labels=[]):
-    taskId=len(tasks) + 1
-    labels.append(priority)
-    tasks[taskId] = {"title": title, "priority": priority, "done": False,
-                     "created": datetime.now().isoformat()}
+def addTask(title, priority="medium", labels=None):
+    if priority not in PRIORITY_ORDER:
+        raise ValueError(f"Unsupported priority: {priority}")
+    taskId = max(tasks, default=0) + 1
+    task_labels = list(labels) if labels is not None else []
+    if priority not in task_labels:
+        task_labels.append(priority)
+    tasks[taskId] = {"title": title, "priority": priority, "labels": task_labels,
+                     "done": False, "created": datetime.now().isoformat()}
     return taskId
 
 
@@ -32,8 +36,9 @@ def pendingTasks():
 
 def findTask(keyword):
     for taskId, task in tasks.items():
-        if keyword.lower() in task["title"].lower():
+        if keyword.casefold() in task["title"].casefold():
             return taskId
+    return None
 
 
 
@@ -67,8 +72,11 @@ def main():
     print("Pending tasks:", pendingTasks())
     print("Task id for 'plumber':", findTask("plumber"))
     print("Task id for 'gym':", findTask("gym")) # returns None silently
-    suggestion = random.choice(pendingTasks())
-    print("Try this next:", suggestion)
+    pending = pendingTasks()
+    if pending:
+        print("Try this next:", random.choice(pending))
+    else:
+        print("No pending tasks to suggest.")
     saveTasks()
     restored = loadTasks()
     print("Tasks restored from file:",len(restored))
