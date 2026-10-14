@@ -7,3 +7,5 @@ venv/
 .venv/
 env/
 
+# Local deliverables that should not be pushed
+checklist.md
