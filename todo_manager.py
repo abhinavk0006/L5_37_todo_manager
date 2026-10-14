@@ -1,6 +1,4 @@
 import json
-import os
-import pickle
 import random
 from datetime import datetime
 
@@ -42,24 +40,22 @@ def findTask(keyword):
 
 
 
-def saveTasks(fileName="tasks.pkl"):
-    with open(fileName, "wb") as f:
-        pickle.dump(tasks, f)
+def saveTasks(fileName="tasks.json"):
+    serializable_tasks = {str(task_id): task for task_id, task in tasks.items()}
+    with open(fileName, "w", encoding="utf-8") as file:
+        json.dump(serializable_tasks, file, indent=2)
 
 
-def loadTasks(fileName="tasks.pkl"):
-    with open(fileName, "rb") as f:
-        return pickle.load(f)
+def loadTasks(fileName="tasks.json"):
+    with open(fileName, "r", encoding="utf-8") as file:
+        loaded_tasks = json.load(file)
+    return {int(task_id): task for task_id, task in loaded_tasks.items()}
 
 
-def exportJson(fileName="tasks.json"):
-    with open(fileName, "w") as f:
-        json.dump(tasks, f, indent=2)
-
-
-def remindByEmail(address):
-    # Helper kept for the lab: not called by the demo
-    os.system("mail -s 'Pending tasks' " + address + " < tasks.json")
+def exportJson(fileName="tasks_export.json"):
+    serializable_tasks = {str(task_id): task for task_id, task in tasks.items()}
+    with open(fileName, "w", encoding="utf-8") as file:
+        json.dump(serializable_tasks, file, indent=2)
 
 
 def main():
